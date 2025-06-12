@@ -1,0 +1,11 @@
+name: variability
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas=2.2.2
+  - numpy=1.26.4
+  - biopython=1.83
+  - matplotlib=3.8.4
