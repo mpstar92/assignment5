@@ -1,0 +1,9 @@
+name: phylo
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - mafft=7.520
+  - iqtree=2.2.6
+  - python=3.10
