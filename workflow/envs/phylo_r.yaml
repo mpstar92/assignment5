@@ -1,0 +1,7 @@
+name: phylo_r
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - r-base
+  - r-ape

@@ -1,0 +1,11 @@
+name: scaffold
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pysam
+  - ragtag
+  - biopython
+  # remove awk and openssl unless you really need them

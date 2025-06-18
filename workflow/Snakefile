@@ -1,0 +1,59 @@
+import pandas as pd
+import os
+import glob
+from snakemake.utils import min_version
+min_version("7.0")
+
+wrapper_prefix = "https://github.com/snakemake/snakemake-wrappers/raw/master/bio"
+
+configfile: "config/config.yaml"
+
+USE_REFERENCE = config.get("use_reference", False)
+USE_POLISHED = config.get("use_polished_assembly", False)
+
+def get_final_assembly(sample):
+    if USE_POLISHED:
+        return f"results/assembly/{sample}/polished.fasta"
+    else:
+        return f"results/assembly/{sample}/spades/contigs.fasta"
+
+contam_fastas = config.get("contamination_fastas", [])
+contam_enabled = bool(contam_fastas)
+
+def get_reads(wildcards):
+    if contam_enabled:
+        return [
+            f"results/filtered/{wildcards.sample}_R1.fastq.gz",
+            f"results/filtered/{wildcards.sample}_R2.fastq.gz"
+        ]
+    else:
+        return [
+            f"results/trimmed/{wildcards.sample}_R1.fastq.gz",
+            f"results/trimmed/{wildcards.sample}_R2.fastq.gz"
+        ]
+        
+samples = pd.read_csv(config["samples"], sep="\t", index_col="sample")
+SAMPLES = samples.index.tolist()
+
+
+if USE_REFERENCE:
+    include: "rules/scaffold.smk"
+    include: "rules/phylogeny.smk"
+    include: "rules/variability.smk"
+
+include: "rules/qc.smk"
+include: "rules/assembly.smk"
+include: "rules/mapping.smk"
+include: "rules/screen.smk"
+include: "rules/contamination.smk"
+include: "rules/polishing.smk"
+
+
+
+
+rule all:
+    input:
+        expand("results/assembly/{sample}/polished.fasta", sample=SAMPLES),
+        expand("results/quast/{sample}/report.txt", sample=SAMPLES),
+        expand("results/kraken2/{sample}.report", sample=SAMPLES),
+        "results/kraken2/multiqc_report.html"

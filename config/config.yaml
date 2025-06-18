@@ -1,0 +1,20 @@
+samples: "config/samples.tsv"
+ragtag_ref: "resources/reference.fna"
+window_size: 100
+spades:
+  extra: "--careful"
+
+fastp:
+  extra: "--detect_adapter_for_pe"
+
+iqtree:
+  extra: "-bb 1000 -m TEST"
+
+contamination_fastas:
+  - "resources/contamination/FASTA/GCA_000935865.1_ASM93586v1_genomic.fna"
+  - "resources/contamination/FASTA/GCF_000935865.1_ASM93586v1_genomic.fna"
+
+use_reference: false
+use_polished_assembly: false
+
+kraken2_db: "resources/kraken2"

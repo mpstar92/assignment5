@@ -1,0 +1,29 @@
+# Snakemake internals
+.snakemake/
+
+# Raw data and results
+data/
+results/
+logs/
+
+# Large references/databases
+resources/kraken2/
+resources/contamination/
+
+# Conda
+*.snakemake-conda*
+.snakejob.*
+.envs/
+*.tar.bz2
+*.conda
+
+# Python & Jupyter cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+*.swp
+*.tmp
+*.log
