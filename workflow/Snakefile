@@ -57,3 +57,8 @@ rule all:
         expand("results/quast/{sample}/report.txt", sample=SAMPLES),
         expand("results/kraken2/{sample}.report", sample=SAMPLES),
         "results/kraken2/multiqc_report.html"
+
+rule screen:
+    input:
+        expand("results/kraken2/{sample}.report", sample=SAMPLES),
+        "results/kraken2/multiqc_report.html"
