@@ -1,6 +1,11 @@
+# config/config.yaml
 samples: "config/samples.tsv"
+
+candidate_refs: "resources/reference/candidate_refs.fasta"
+
 ragtag_ref: "resources/reference.fna"
 window_size: 100
+
 spades:
   extra: "--careful"
 
@@ -11,11 +16,10 @@ iqtree:
   extra: "-bb 1000 -m TEST"
 
 contamination_fastas:
-  - "resources/contamination/FASTA/Homo_sapiens.GRCh38.dna.alt.fa"
   - "resources/contamination/FASTA/GCA_000935865.1_ASM93586v1_genomic.fna"
   - "resources/contamination/FASTA/GCF_000935865.1_ASM93586v1_genomic.fna"
 
 kraken2_db: "https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20250402.tar.gz"
 
-use_reference: true #false
-use_polished_assembly: true #false
+use_reference: true
+use_polished_assembly: true

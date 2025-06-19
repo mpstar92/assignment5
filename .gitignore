@@ -9,6 +9,7 @@ logs/
 # Large references/databases
 resources/kraken2/
 resources/contamination/
+resources/references/
 
 # Conda
 *.snakemake-conda*

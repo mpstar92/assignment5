@@ -22,7 +22,7 @@ rule bwa_map:
         temp("results/mapping/{sample}.sam")
     log:
         "logs/bwa/mem_{sample}.log"
-    threads: 4
+    threads: 8
     conda:
         "../envs/bwa.yaml"
     shell:

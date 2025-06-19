@@ -7,7 +7,7 @@ rule pilon_polish:
         polished = "results/assembly/{sample}/polished.fasta"
     log:
         "logs/pilon/{sample}.log"
-    threads: 4
+    threads: 8
     conda:
         "../envs/pilon.yaml"
     shell:

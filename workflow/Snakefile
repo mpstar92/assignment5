@@ -4,80 +4,94 @@ import glob
 from snakemake.utils import min_version
 min_version("7.0")
 
+# Config and flags
 wrapper_prefix = "https://github.com/snakemake/snakemake-wrappers/raw/master/bio"
-
 configfile: "config/config.yaml"
 
 USE_REFERENCE = config.get("use_reference", False)
 USE_POLISHED = config.get("use_polished_assembly", False)
+CANDIDATE_REFS = config.get("candidate_refs", [])
+assert not (USE_REFERENCE and not CANDIDATE_REFS), \
+       "When use_reference is True, you must set candidate_refs in config to a FASTA file or list!"
+
+# Helper functions
 def get_patching_input(sample):
-    if USE_POLISHED:
-        return f"results/assembly/{sample}/polished.fasta"
-    else:
-        return f"results/assembly/{sample}/spades/contigs.fasta"
-    
+    return (f"results/assembly/{sample}/polished.fasta" if USE_POLISHED
+            else f"results/assembly/{sample}/spades/contigs.fasta")
+
 def get_final_assembly(sample):
     if USE_REFERENCE and USE_POLISHED:
-        # Both true: use patched (patched uses polished)
-        return f"results/patching/{sample}/ragtag.patch.rename.fasta"
+        return f"results/patching/{sample}/ragtag.patch.fasta"
     elif USE_REFERENCE and not USE_POLISHED:
-        # Only reference: use patched (patched uses unpolished)
-        return f"results/patching/{sample}/ragtag.patch.rename.fasta"
+        return f"results/patching/{sample}/ragtag.patch.fasta"
     elif not USE_REFERENCE and USE_POLISHED:
-        # Only polished: use polished
         return f"results/assembly/{sample}/polished.fasta"
     else:
-        # Both false: use spades contigs
         return f"results/assembly/{sample}/spades/contigs.fasta"
-    
+
 contam_fastas = config.get("contamination_fastas", [])
 contam_enabled = bool(contam_fastas)
 
-def get_reads(wildcards):
+def get_reads(wc):
     if contam_enabled:
-        return [
-            f"results/filtered/{wildcards.sample}_R1.fastq.gz",
-            f"results/filtered/{wildcards.sample}_R2.fastq.gz"
-        ]
+        return [f"results/filtered/{wc.sample}_R1.fastq.gz",
+                f"results/filtered/{wc.sample}_R2.fastq.gz"]
     else:
-        return [
-            f"results/trimmed/{wildcards.sample}_R1.fastq.gz",
-            f"results/trimmed/{wildcards.sample}_R2.fastq.gz"
-        ]
-        
+        return [f"results/trimmed/{wc.sample}_R1.fastq.gz",
+                f"results/trimmed/{wc.sample}_R2.fastq.gz"]
+
+# Samples
 samples = pd.read_csv(config["samples"], sep="\t", index_col="sample")
 SAMPLES = samples.index.tolist()
 
-
-# Conditionally include polishing
+# Include optional modules
 if USE_POLISHED:
     include: "rules/polishing.smk"
 
-# Always include these
-include: "rules/qc.smk"
 include: "rules/assembly.smk"
-include: "rules/mapping.smk"
-include: "rules/screen.smk"
+include: "rules/qc.smk"
 include: "rules/contamination.smk"
 include: "rules/blast.smk"
 include: "rules/scaffold.smk"
-include: "rules/phylogeny.smk"
+include: "rules/mapping.smk"
 include: "rules/variability.smk"
-# Conditionally include patching if reference is used
+include: "rules/phylogeny.smk"
+include: "rules/screen.smk"
+
+# Patching & consensus if reference is used
 if USE_REFERENCE:
     include: "rules/patching.smk"
+    include: "rules/consensus.smk"
 
+# Rule all
 rule all:
     input:
-        expand("results/assembly/{sample}/polished.fasta", sample=SAMPLES)
-        + expand("results/quast/{sample}/report.txt", sample=SAMPLES)
-        + expand("results/kraken2/{sample}.report", sample=SAMPLES)
-        + ["results/kraken2/multiqc_report.html"]
-        + ["results/alignment/mafft_alignment.fasta"]
-        + ["results/tree/phylo_tree.nwk"]
-        + expand("results/blast/{sample}_viral.txt", sample=SAMPLES)
-        + (expand("results/patching/{sample}/ragtag.patch.rename.fasta", sample=SAMPLES) if USE_REFERENCE else [])
+        # optional polished
+        expand("results/assembly/{sample}/polished.fasta", sample=SAMPLES) if USE_POLISHED else [],
+        # QC & reports
+        expand("results/quast/{sample}/report.txt", sample=SAMPLES),
+        expand("results/kraken2/{sample}.report", sample=SAMPLES),
+        "results/kraken2/multiqc_report.html",
+        "results/alignment/mafft_alignment.fasta",
+        "results/tree/phylo_tree.nwk",
+        expand("results/blast/{sample}_viral.txt", sample=SAMPLES),
+        # patch outputs
+        expand("results/patching/{sample}/ragtag.patch.fasta", sample=SAMPLES) if USE_REFERENCE else [],
+        expand("results/scaffold/{sample}/ragtag.scaffold.fasta", sample=SAMPLES),
+        # consensus outputs
+        expand("results/consensus/{sample}.consensus.fasta", sample=SAMPLES) if USE_REFERENCE else []
+
+
+# rule screen:
+  #  input:
+   #     expand("results/kraken2/{sample}.report", sample=SAMPLES),
+    #    "results/kraken2/multiqc_report.html"
+
 rule screen:
     input:
         expand("results/kraken2/{sample}.report", sample=SAMPLES),
         "results/kraken2/multiqc_report.html"
+    output:
+        touch("results/kraken2/.screen.done")
+    shell:
+        "touch {output}"

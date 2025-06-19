@@ -8,7 +8,7 @@ rule bowtie2_build_contam:
         fasta=contam_fastas
     output:
         "resources/contamination/contaminants.bt2.index.done"
-    threads: 1
+    threads: 4
     params:
         fasta_list = lambda wildcards, input: ",".join(input.fasta)
     conda:
@@ -30,7 +30,7 @@ rule remove_contamination:
         sam = temp("results/filtered/{sample}.contam.sam")
     log:
         "logs/contamination/{sample}.log"
-    threads: 4
+    threads: 8
     conda:
         "../envs/bowtie2.yaml"
     shell:

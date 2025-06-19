@@ -7,7 +7,7 @@ rule spades:
         fasta = "results/assembly/{sample}/spades/contigs.fasta"
     log:
         "logs/assembly/{sample}.log"
-    threads: 4
+    threads: 8
     conda:
         "../envs/assembly.yaml"
     #shell:
@@ -26,7 +26,7 @@ rule quast:
         "results/quast/{sample}/report.txt"
     log:
         "logs/quast/{sample}.log"
-    threads: 2
+    threads: 4
     conda:
         "../envs/assembly.yaml"
     shell:

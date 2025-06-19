@@ -15,7 +15,7 @@ rule mafft:
         "results/alignment/mafft_alignment.fasta"
     log:
         "logs/mafft/alignment.log"
-    threads: 8
+    threads: 12
     conda:
         "../envs/phylo.yaml"
     shell:
@@ -29,7 +29,7 @@ rule rtree:
         alignment = "results/alignment/mafft_alignment.fasta"
     output:
         tree = "results/tree/phylo_tree.nwk"
-    threads: 4
+    threads: 8
     conda:
         "../envs/phylo_r.yaml"
     script:

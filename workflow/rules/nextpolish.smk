@@ -7,7 +7,7 @@ rule nextpolish:
         polished = "results/assembly/{sample}/spades/contigs.nextpolish.fa"
     log:
         "logs/nextpolish/{sample}.log"
-    threads: 4
+    threads: 8
     conda:
         "../envs/nextpolish.yaml"
     shell:
