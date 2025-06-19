@@ -2,7 +2,7 @@ rule pilon_polish:
     input:
         bam = "results/mapping_sorted/{sample}.bam",
         bai = "results/mapping_sorted/{sample}.bam.bai",
-        ref = "results/assembly/{sample}/spades/contigs.fasta"  # ← wichtig!
+        ref = "results/assembly/{sample}/spades/contigs.fasta"  
     output:
         polished = "results/assembly/{sample}/polished.fasta"
     log:

@@ -1,0 +1,4 @@
+conda install -c bioconda entrez-direct
+
+mkdir -p resources/reference_patch
+efetch -db nucleotide -format fasta -id AC_000007.1 > resources/reference_patch/AC_000007.1.fasta

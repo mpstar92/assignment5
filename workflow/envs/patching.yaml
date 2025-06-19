@@ -1,0 +1,9 @@
+name: patching
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - ragtag
+  - wget
+  - python=3.9

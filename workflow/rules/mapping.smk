@@ -1,6 +1,6 @@
 rule bwa_index:
     input:
-        ref = lambda wc: get_final_assembly(wc.sample)
+        ref = "results/assembly/{sample}/spades/contigs.fasta"
     output:
         ref = "results/assembly/{sample}/spades/contigs.fasta.bwt"
     log:
@@ -14,8 +14,8 @@ rule bwa_index:
 
 rule bwa_map:
     input:
-        ref = lambda wc: get_final_assembly(wc.sample),
-        index = lambda wc: get_final_assembly(wc.sample) + ".bwt",
+        ref = "results/assembly/{sample}/spades/contigs.fasta",
+        index = "results/assembly/{sample}/spades/contigs.fasta.bwt",
         fq1 = lambda wc: get_reads(wc)[0],
         fq2 = lambda wc: get_reads(wc)[1]
     output:

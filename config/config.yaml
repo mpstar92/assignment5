@@ -11,10 +11,11 @@ iqtree:
   extra: "-bb 1000 -m TEST"
 
 contamination_fastas:
+  - "resources/contamination/FASTA/Homo_sapiens.GRCh38.dna.alt.fa"
   - "resources/contamination/FASTA/GCA_000935865.1_ASM93586v1_genomic.fna"
   - "resources/contamination/FASTA/GCF_000935865.1_ASM93586v1_genomic.fna"
 
-use_reference: false
-use_polished_assembly: false
+kraken2_db: "https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20250402.tar.gz"
 
-kraken2_db: "resources/kraken2"
+use_reference: true #false
+use_polished_assembly: true #false

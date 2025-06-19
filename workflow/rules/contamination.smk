@@ -44,4 +44,3 @@ rule remove_contamination:
                 -1 {output.r1} -2 {output.r2} \
                 {output.sam}
         """
-
